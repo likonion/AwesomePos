@@ -6,9 +6,9 @@
           <el-table :data="tableData" stripe border show-summary style="width: 100%" height="100%"
                     :summary-method="total">
 
-            <el-table-column prop="goodsName" label="商品" ></el-table-column>
-            <el-table-column sortable prop="count" label="量" ></el-table-column>
-            <el-table-column sortable prop="price" label="单价" ></el-table-column>
+            <el-table-column prop="goodsName" label="商品"></el-table-column>
+            <el-table-column sortable prop="count" label="量"></el-table-column>
+            <el-table-column sortable prop="price" label="单价"></el-table-column>
             <el-table-column label="操作" width="100" fixed="right">
               <template scope="scope">
                 <el-button type="danger" size="mini" icon="minus" @click="removeChat(scope.row)"></el-button>
@@ -17,10 +17,12 @@
               </template>
             </el-table-column>
           </el-table>
+
+
           <div class="order-btn">
-            <el-button type="warning">挂单</el-button>
-            <el-button type="danger">删除</el-button>
-            <el-button type="success">结账</el-button>
+            <el-button type="warning" @click="setOrder">挂单</el-button>
+            <el-button type="danger" @click="clearChat">清空</el-button>
+            <el-button type="success" @click="pay">结账</el-button>
           </div>
         </el-tab-pane>
         <el-tab-pane label="挂单">
@@ -88,6 +90,14 @@
         </el-tabs>
       </div>
     </div>
+    <el-dialog title="结账" :visible.sync="dialogTableVisible">
+      <el-steps :space="200" :active="active">
+        <el-step title="步骤 1" description="这是一段很长很长很长的描述性文字"></el-step>
+        <el-step title="步骤 2" description="这是一段很长很长很长的描述性文字"></el-step>
+        <el-step title="步骤 3" description="这是一段很长很长很长的描述性文字"></el-step>
+      </el-steps>
+      <el-button style="margin-top: 12px;" @click="next">下一步</el-button>
+    </el-dialog>
   </div>
 </template>
 
@@ -103,7 +113,10 @@
         foods: [],
         snacks: [],
         combo: [],
-        drinks: []
+        drinks: [],
+        totalMoney: 0,
+        dialogTableVisible: false,
+        active: 0
       }
     },
     computed: {
@@ -148,9 +161,67 @@
           totalMoney += data.price * data.count
           totalCount += data.count
         })
+        this.totalMoney = totalMoney
         let sums = ['总价', totalCount, totalMoney]
         return sums;
 
+      },
+      clearChat() {
+        if (this.tableData.length === 0) {
+          this.$notify.error({
+            title: '错误',
+            message: '您的订单为空，请添加订单！'
+          });
+        } else {
+          this.$confirm('确定要清空购物车吗？', {
+            confirmButtonText: '确定',
+            cancelButtonText: '点错了',
+            type: 'warning'
+          }).then(() => {
+            this.tableData = [];
+            this.$message({
+              type: 'success',
+              message: '清空购物车成功!'
+            });
+          }).catch(() => {
+
+          });
+        }
+      },
+      // 挂单
+      setOrder() {
+
+        if (this.tableData.length === 0) {
+          this.$notify.error({
+            title: '错误',
+            message: '您的订单为空，请添加订单！'
+          });
+        } else {
+          this.tableData = [];
+          this.$notify({
+            title: '成功',
+            message: '挂单成功',
+            type: 'success'
+          });
+        }
+
+      },
+      // 结账
+      pay() {
+        if (this.totalMoney !== 0) {
+          this.dialogTableVisible = true;
+        } else {
+          this.$message.error('您还没有点餐哦，请添加您想吃的！');
+        }
+
+      },
+      // Steps 步骤条
+      next() {
+        if (this.active++ > 2) {
+          this.active = 0;
+          this.dialogTableVisible = false;
+          this.tableData = [];
+        }
       }
     },
     created() {
@@ -178,33 +249,37 @@
     justify-content: center;
     flex: 1 1 auto;
     .order-list {
-      flex: 0 0 302px;
+      flex: 0;
       height: 100%;
       background-color: #f9fafc;
       border-right: 1px solid #eee;
       .el-tabs {
+        width: 350px;
         height: 100%;
         display: flex;
         flex-flow: column nowrap;
         .el-tabs__header {
           margin: 0;
-          flex: 0 0 auto;
         }
         .el-tabs__content {
           height: 100%;
           flex: 1 1 auto;
           .el-tab-pane {
-            height: 100%;
-            display: flex;
-            flex-flow: column nowrap;
             .el-table {
-              flex: 1 1 auto;
+              position: absolute;
+              left: 0;
+              top: 0;
+              bottom: 44px;
+              overflow: hidden;
             }
             .order-btn {
-              flex: 0 0 auto;
+              position: absolute;
+              bottom: 0;
+              height: 44px;
               padding: 5px;
-              height: 50px;
+              width: 100%;
             }
+
           }
         }
       }
