@@ -1,7 +1,10 @@
 # awesomepos
-
+> 快餐店收银系统
 ## 技术栈
-vue2 + vuex + vue-router + webpack + ES6/7 + element-ui + sass 
+vue2 + vuex + vue-router + webpack + ES6/7 + element-ui + sass + mockJs
+
+## 界面
+![Alt text](./static/screen.png "界面")
 
 ## Build Setup
 
@@ -19,4 +22,3 @@ npm run build
 npm run build --report
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
